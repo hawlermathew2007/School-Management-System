@@ -19,9 +19,8 @@ typedef union {
 void showStudentsDetails(Student[], int);
 void addStudentDetails(Student[], int*);
 void findBy_(char, Student[], int, Union);
-int giveNoStudents();
-void deleteStudent(char);
-void updateStudent(char);
+void deleteStudent(Student[], int*);
+void updateStudent(Student[], int);
 
 int main() {
     Student students[MAX_STUDENTS] = {
@@ -96,10 +95,10 @@ int main() {
                 
                 break;
             case 4:
-                printf("Delete Students");
+                deleteStudent(students, &studentsNo);
                 break;
             case 5:
-                printf("Update Students");
+                updateStudent(students, studentsNo);
                 break;
             case 6:
                 printf("Exiting...\n");
@@ -112,6 +111,14 @@ int main() {
     return 0;
 }
 
+void printAstudent(Student student){
+    printf("Roll Number: %d\n", student.rollNumber);
+    printf("First Name: %s\n", student.firstName);
+    printf("Full Name: %s\n", student.fullName);
+    printf("Age: %d\n", student.age);
+    printf("Course: %s", student.course);
+}
+
 void showStudentsDetails(Student students[], int studentsNo){
     if(studentsNo == 0){
         printf("\n==================================\n");
@@ -122,20 +129,16 @@ void showStudentsDetails(Student students[], int studentsNo){
     printf("\nDETAILS OF ALL STUDENTS");
     for(int i = 0; i < studentsNo; i ++){
         printf("\n==================================\n");
-        printf("Roll Number: %d\n", students[i].rollNumber);
-        printf("First Name: %s\n", students[i].firstName);
-        printf("Full Name: %s\n", students[i].fullName);
-        printf("Age: %d\n", students[i].age);
-        printf("Course: %s", students[i].course);
+        printAstudent(students[i]);
     };
     printf("\n==================================\n");
 }
 
 void addStudentDetails(Student students[], int * studentsNo){
     
-    if((*studentsNo + 1) == MAX_STUDENTS){
+    if(*studentsNo == MAX_STUDENTS){
         printf("\n==================================\n");
-        printf("There is currently 0 Students.");
+        printf("Maximum Students is Reached!");
         printf("\n==================================\n");
         return;
     }
@@ -241,13 +244,136 @@ void findBy_(char this, Student students[], int studentsNo, Union data){
     
     for(int i = 0; i <  targetStudentsNo; i ++){
         printf("\n==================================\n");
-        printf("Roll Number: %d\n", targetStudents[i].rollNumber);
-        printf("First Name: %s\n", targetStudents[i].firstName);
-        printf("Full Name: %s\n", targetStudents[i].fullName);
-        printf("Age: %d\n", targetStudents[i].age);
-        printf("Course: %s", targetStudents[i].course);
+        printAstudent(targetStudents[i]);
     }
     printf("\n==================================\n");
 
 }
 
+void deleteStudent(Student students[], int *studentsNo){
+
+    if(*studentsNo == 0){
+        printf("\n==================================\n");
+        printf(">>> There is 0 Students, so cannot delete.");
+        printf("\n==================================\n");
+        return;
+    }
+
+    int userRollNumber;
+
+    printf("\nDELETE STUDENT");
+
+    printf("\n- Enter the Student\'s Roll Number: ");
+    scanf("%d", &userRollNumber);
+
+
+    for(int i = 0; i < *studentsNo; i++){
+        if(students[i].rollNumber == userRollNumber){
+
+            printf("\n========= DELETED STUDENT =========\n");
+            printAstudent(students[i]);
+            printf("\n===================================\n");
+
+            students[i] = students[--(*studentsNo)];
+            printf("\nSuccessfully deleted the student!");
+            
+            return;
+        }
+    }
+
+    printf("\n===================================\n");
+    printf(">>> No student with this Roll Number!");
+    printf("\n===================================\n");
+
+}
+
+void updateStudent(Student students[], int studentsNo){
+
+    if(studentsNo == 0){
+        printf("\n==================================\n");
+        printf(">>> There is 0 Students, so cannot update.");
+        printf("\n==================================\n");
+        return;
+    }
+
+    int userRollNumber;
+
+    printf("\nUPDATE STUDENT");
+
+    printf("\n- Enter the Student\'s Roll Number: ");
+    scanf("%d", &userRollNumber);
+
+    for(int i = 0; i < studentsNo; i++){
+        if(students[i].rollNumber == userRollNumber){
+
+            int userChoice = 0;
+            Union userUpdate;
+
+            printf("\n========== FOUND STUDENT ==========\n");
+            printAstudent(students[i]);
+            printf("\n===================================\n");
+            
+            printf("\nWhat attribute of this student do you want update? (1 - 5)\n");
+            printf("1. Roll Number\n");
+            printf("2. First Name\n");
+            printf("3. Full Name\n");
+            printf("4. Age\n");
+            printf("5. Course\n");
+            printf("6. Cancel Updating Student Process\n");
+
+
+            printf("\nEnter your choice: ");
+            scanf("%d", &userChoice);
+            
+            if (userChoice == 6){
+                printf("\n===================================\n");
+                printf("Cancel successfully!");
+                printf("\n===================================\n");
+                return;
+            }
+
+            printf("Enter your Update: ");
+            if(userChoice == 1 || userChoice == 4){
+                scanf("%d", &userUpdate.number);
+
+            } else{
+                getchar();
+                fgets(userUpdate.text, sizeof(userUpdate.text), stdin);
+                userUpdate.text[strcspn(userUpdate.text, "\n")] = '\0';
+            }
+
+            switch (userChoice)
+            {
+            case 1:
+                students[i].rollNumber = userUpdate.number;
+                break;
+            case 2:
+                strcpy(students[i].firstName, userUpdate.text);
+                break;
+            case 3:
+                strcpy(students[i].fullName, userUpdate.text);
+                break;
+            case 4:
+                students[i].age = userUpdate.number;
+                break;
+            case 5:
+                strcpy(students[i].course, userUpdate.text);
+                break;
+            
+            default:
+                printf("Please type the related response!");
+                return;
+                break;
+            }
+            printf("\n===================================\n");
+            printf("Update Student successfully!");
+            printf("\n===================================\n");
+            return;
+        }
+    }
+
+    printf("\n===================================\n");
+    printf(">>> No student with this Roll Number!");
+    printf("\n===================================\n");
+
+}
